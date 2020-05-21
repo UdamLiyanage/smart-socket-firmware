@@ -19,10 +19,6 @@
 #define URN 'fc1d82c0-c4cd-42fe-b8f5-da0b44f86a73'
 #define CONFIG_LED 14
 
-int blink(int blinkPin);
-void tick();
-void configModeCallback (WiFiManager *myWiFiManager);
-
 Ticker ticker;
 
 void tick() {
