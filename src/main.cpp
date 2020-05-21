@@ -17,8 +17,12 @@
  * URN = Unique Resource Number. A unique string the platform uses to differentiate between resources. 
  * */
 #define SERIAL_NUMBER '0000000001'
-#define URN 'fc1d82c0-c4cd-42fe-b8f5-da0b44f86a73'
+//#define URN 'fc1d82c0-c4cd-42fe-b8f5-da0b44f86a73'
 #define CONFIG_LED 14
+
+const String URN = "fc1d82c0-c4cd-42fe-b8f5-da0b44f86a73";
+const String UPDATE_TOPIC = "/althinect/things/fc1d82c0-c4cd-42fe-b8f5-da0b44f86a73/update";
+const String DELTA_TOPIC = "/althinect/things/" + URN + "/update/delta";
 
 Ticker ticker;
 
@@ -40,7 +44,9 @@ void reconnect() {
     Serial.print("Attempting MQTT connection...");
     if (client.connect("arduinoClient")) {
       Serial.println("connected");
-      client.publish("/heartbeat", URN + "Connected!");
+      client.publish("/althinect/things/fc1d82c0-c4cd-42fe-b8f5-da0b44f86a73/update", ("Connected"));
+      client.subscribe("/althinect/things/fc1d82c0-c4cd-42fe-b8f5-da0b44f86a73/update");
+      client.subscribe("/althinect/things/fc1d82c0-c4cd-42fe-b8f5-da0b44f86a73/update/delta");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -73,8 +79,8 @@ void setup() {
    * Disconnecting and Deleting WiFi for Testing Purposes. Remove in production
    * 
    * */
-  wifiManager.disconnect();
-  wifiManager.erase();
+  //wifiManager.disconnect();
+  //wifiManager.erase();
   //End of Test Code Snippet
 
   if (!wifiManager.autoConnect("SmartSocketAP")) {
