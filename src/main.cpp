@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <blink.cpp>
 #if defined(ESP8266)
 #include <ESP8266WiFi.h>
 #elif defined(ESP32)
@@ -15,7 +16,12 @@ void setup() {
     pinMode(12, OUTPUT);
     WiFiManager wifiManager;
     wifiManager.autoConnect("AutoConnectAP");
-    Serial.println("connected...yeey :)");
+    int k = blink(12);
+    if (k == 1) {
+      Serial.println("Connected to Network");
+    } else {
+      Serial.println("Network Connection Failed");
+    }
 }
 
 void loop() {
