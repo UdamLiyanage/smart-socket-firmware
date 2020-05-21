@@ -37,6 +37,16 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.println();
   if (String(topic) == "/althinect/things/fc1d82c0-c4cd-42fe-b8f5-da0b44f86a73/shadow/update/delta") {
     Serial.println("Delta Topic");
+    const size_t capacity = JSON_OBJECT_SIZE(1) + 10;
+    DynamicJsonDocument doc(capacity);
+
+    deserializeJson(doc, payload, length);
+
+    if (doc["state"] == "on") {
+      Serial.println("ON");
+    } else {
+      Serial.println("OFF");
+    }
   } 
 }
 
