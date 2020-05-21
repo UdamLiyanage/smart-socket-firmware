@@ -11,6 +11,7 @@
 #include <WiFiManager.h>
 #include <Ticker.h>
 #include <PubSubClient.h>
+#include <ArduinoJson.h>
 
 /**
  * Constants.
@@ -34,6 +35,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
     Serial.print((char)payload[i]);
   }
   Serial.println();
+  if (String(topic) == "/althinect/things/fc1d82c0-c4cd-42fe-b8f5-da0b44f86a73/shadow/update/delta") {
+    Serial.println("Delta Topic");
+  } 
 }
 
 WiFiClient espClient;
@@ -44,9 +48,8 @@ void reconnect() {
     Serial.print("Attempting MQTT connection...");
     if (client.connect("arduinoClient")) {
       Serial.println("connected");
-      client.publish("/althinect/things/fc1d82c0-c4cd-42fe-b8f5-da0b44f86a73/update", ("Connected"));
-      client.subscribe("/althinect/things/fc1d82c0-c4cd-42fe-b8f5-da0b44f86a73/update");
-      client.subscribe("/althinect/things/fc1d82c0-c4cd-42fe-b8f5-da0b44f86a73/update/delta");
+      client.publish("/althinect/things/fc1d82c0-c4cd-42fe-b8f5-da0b44f86a73/heartbeat", ("Connected"));
+      client.subscribe("/althinect/things/fc1d82c0-c4cd-42fe-b8f5-da0b44f86a73/shadow/update/delta");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
