@@ -9,13 +9,43 @@
 #endif
 #include <DNSServer.h>
 #include <WiFiManager.h>
+#include <Ticker.h>
+
+/**
+ * Constants
+ * 
+ * */
+#define SERIAL_NUMBER '0000000001'
+#define URN 'fc1d82c0-c4cd-42fe-b8f5-da0b44f86a73'
+#define CONFIG_LED 14
 
 int blink(int blinkPin);
+void tick();
+void configModeCallback (WiFiManager *myWiFiManager);
+
+Ticker ticker;
+
+void tick() {
+    int state = digitalRead(CONFIG_LED);
+    digitalWrite(CONFIG_LED, !state);
+}
+
+//gets called when WiFiManager enters configuration mode
+void configModeCallback (WiFiManager *myWiFiManager) {
+  Serial.println("Entered config mode");
+  Serial.println(WiFi.softAPIP());
+  //if you used auto generated SSID, print it
+  Serial.println(myWiFiManager->getConfigPortalSSID());
+  //entered config mode, make led toggle faster
+  ticker.attach(0.2, tick);
+}
 
 void setup() {
   Serial.begin(115200);
-  pinMode(12, OUTPUT);
+  pinMode(CONFIG_LED, OUTPUT);
+  ticker.attach(0.6, tick);
   WiFiManager wifiManager;
+  wifiManager.setAPCallback(configModeCallback);
   /** 
    * 
    * Disconnecting and Deleting WiFi for Testing Purposes. Remove in production
@@ -24,20 +54,19 @@ void setup() {
   wifiManager.disconnect();
   wifiManager.erase();
   //End of Test Code Snippet
-  
-  wifiManager.autoConnect("AutoConnectAP");
-  int k = 0;
-  k = blink(12);
-  if (k == 1) {
-    Serial.println("Connected to Network");
-  } else {
-    Serial.println("Network Connection Failed");
+
+  if (!wifiManager.autoConnect()) {
+    Serial.println("failed to connect and hit timeout");
+    delay(1000);
   }
+  Serial.println("Connected to Network!");
+  ticker.detach();
+  digitalWrite(CONFIG_LED, HIGH);
 }
 
 void loop() {
-  digitalWrite(12, HIGH);
+  digitalWrite(14, HIGH);
   delay(100);
-  digitalWrite(12,LOW);
+  digitalWrite(14,LOW);
   delay(100);
 }
