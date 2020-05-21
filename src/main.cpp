@@ -27,6 +27,9 @@ const String DELTA_TOPIC = "/althinect/things/" + URN + "/update/delta";
 
 Ticker ticker;
 
+WiFiClient espClient;
+PubSubClient client(espClient);
+
 void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);
@@ -44,14 +47,13 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
     if (doc["state"] == "on") {
       Serial.println("ON");
+      client.publish("/test", "State Changed to ON");
     } else {
       Serial.println("OFF");
+      client.publish("/test", "State Changed to OFF");
     }
   } 
 }
-
-WiFiClient espClient;
-PubSubClient client(espClient);
 
 void reconnect() {
   while (!client.connected()) {
