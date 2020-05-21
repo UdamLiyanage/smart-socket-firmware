@@ -12,8 +12,8 @@
 #include <Ticker.h>
 
 /**
- * Constants
- * 
+ * Constants.
+ * URN = Unique Resource Number. A unique string the platform uses to differentiate between resources. 
  * */
 #define SERIAL_NUMBER '0000000001'
 #define URN 'fc1d82c0-c4cd-42fe-b8f5-da0b44f86a73'
@@ -26,13 +26,10 @@ void tick() {
     digitalWrite(CONFIG_LED, !state);
 }
 
-//gets called when WiFiManager enters configuration mode
-void configModeCallback (WiFiManager *myWiFiManager) {
+void configModeCallback (WiFiManager *wifiManager) {
   Serial.println("Entered config mode");
   Serial.println(WiFi.softAPIP());
-  //if you used auto generated SSID, print it
-  Serial.println(myWiFiManager->getConfigPortalSSID());
-  //entered config mode, make led toggle faster
+  Serial.println(wifiManager->getConfigPortalSSID());
   ticker.attach(0.2, tick);
 }
 
@@ -51,7 +48,7 @@ void setup() {
   wifiManager.erase();
   //End of Test Code Snippet
 
-  if (!wifiManager.autoConnect()) {
+  if (!wifiManager.autoConnect("SmartSocketAP")) {
     Serial.println("failed to connect and hit timeout");
     delay(1000);
   }
