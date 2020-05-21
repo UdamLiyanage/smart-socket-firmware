@@ -10,6 +10,7 @@
 #include <DNSServer.h>
 #include <WiFiManager.h>
 #include <Ticker.h>
+#include <PubSubClient.h>
 
 /**
  * Constants.
@@ -20,6 +21,34 @@
 #define CONFIG_LED 14
 
 Ticker ticker;
+
+void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.print("] ");
+  for (int i=0;i<length;i++) {
+    Serial.print((char)payload[i]);
+  }
+  Serial.println();
+}
+
+WiFiClient espClient;
+PubSubClient client(espClient);
+
+void reconnect() {
+  while (!client.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    if (client.connect("arduinoClient")) {
+      Serial.println("connected");
+      client.publish("/heartbeat", URN + "Connected!");
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+      delay(5000);
+    }
+  }
+}
 
 void tick() {
     int state = digitalRead(CONFIG_LED);
@@ -55,11 +84,15 @@ void setup() {
   Serial.println("Connected to Network!");
   ticker.detach();
   digitalWrite(CONFIG_LED, HIGH);
+
+  client.setServer("broker.abydub.com", 1883);
+  client.setCallback(callback);
+  delay(1500);
 }
 
 void loop() {
-  digitalWrite(14, HIGH);
-  delay(100);
-  digitalWrite(14,LOW);
-  delay(100);
+  if (!client.connected()) {
+    reconnect();
+  }
+  client.loop();
 }
