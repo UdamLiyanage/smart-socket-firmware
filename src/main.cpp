@@ -13,17 +13,26 @@
 int blink(int blinkPin);
 
 void setup() {
-    Serial.begin(115200);
-    pinMode(12, OUTPUT);
-    WiFiManager wifiManager;
-    wifiManager.autoConnect("AutoConnectAP");
-    int k = 0;
-    k = blink(12);
-    if (k == 1) {
-      Serial.println("Connected to Network");
-    } else {
-      Serial.println("Network Connection Failed");
-    }
+  Serial.begin(115200);
+  pinMode(12, OUTPUT);
+  WiFiManager wifiManager;
+  /** 
+   * 
+   * Disconnecting and Deleting WiFi for Testing Purposes. Remove in production
+   * 
+   * */
+  wifiManager.disconnect();
+  wifiManager.erase();
+  //End of Test Code Snippet
+  
+  wifiManager.autoConnect("AutoConnectAP");
+  int k = 0;
+  k = blink(12);
+  if (k == 1) {
+    Serial.println("Connected to Network");
+  } else {
+    Serial.println("Network Connection Failed");
+  }
 }
 
 void loop() {
