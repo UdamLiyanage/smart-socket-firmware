@@ -47,9 +47,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
     if (doc["state"] == "on") {
       Serial.println("ON");
+      digitalWrite(12, HIGH);
       client.publish("/test", "State Changed to ON");
     } else {
       Serial.println("OFF");
+      digitalWrite(12, LOW);
       client.publish("/test", "State Changed to OFF");
     }
   } 
@@ -86,6 +88,7 @@ void configModeCallback (WiFiManager *wifiManager) {
 void setup() {
   Serial.begin(115200);
   pinMode(CONFIG_LED, OUTPUT);
+  pinMode(12, OUTPUT);
   ticker.attach(0.6, tick);
   WiFiManager wifiManager;
   wifiManager.setAPCallback(configModeCallback);
