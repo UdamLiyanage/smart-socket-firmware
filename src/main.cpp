@@ -134,6 +134,7 @@ void setup() {
   client.setServer("broker.abydub.com", 1883);
   client.setCallback(callback);
   delay(1500);
+  //test
 }
 
 void loop() {
