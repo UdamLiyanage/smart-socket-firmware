@@ -30,6 +30,10 @@ Ticker ticker;
 WiFiClient espClient;
 PubSubClient client(espClient);
 
+void publishState(char newState[]) {
+  
+}
+
 void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);
@@ -48,26 +52,31 @@ void callback(char* topic, byte* payload, unsigned int length) {
     if (doc["state"] == "on") {
       Serial.println("ON");
       digitalWrite(12, HIGH);
-      publishState("on");
+      const size_t capacity = 3*JSON_OBJECT_SIZE(1);
+      DynamicJsonDocument doc(capacity);
+
+      JsonObject state = doc.createNestedObject("state");
+      JsonObject state_desired = state.createNestedObject("reported");
+      state_desired["state"] = "on";
+
+      char buffer[512];
+      size_t n = serializeJson(doc, buffer);
+      client.publish("/althinect/things/fc1d82c0-c4cd-42fe-b8f5-da0b44f86a73/shadow/update", buffer, n);
     } else {
       Serial.println("OFF");
       digitalWrite(12, LOW);
-      publishState("off");
+      const size_t capacity = 3*JSON_OBJECT_SIZE(1);
+      DynamicJsonDocument doc(capacity);
+
+      JsonObject state = doc.createNestedObject("state");
+      JsonObject state_desired = state.createNestedObject("reported");
+      state_desired["state"] = "off";
+
+      char buffer[512];
+      size_t n = serializeJson(doc, buffer);
+      client.publish("/althinect/things/fc1d82c0-c4cd-42fe-b8f5-da0b44f86a73/shadow/update", buffer, n);
     }
   } 
-}
-
-void publishState(String newState) {
-  const size_t capacity = 3*JSON_OBJECT_SIZE(1);
-  DynamicJsonDocument doc(capacity);
-
-  JsonObject state = doc.createNestedObject("state");
-  JsonObject state_desired = state.createNestedObject("desired");
-  state_desired["state"] = newState;
-
-  char buffer[512];
-  size_t n = serializeJson(doc, buffer);
-  client.publish("/althinect/things/fc1d82c0-c4cd-42fe-b8f5-da0b44f86a73/shadow/update", buffer, n);
 }
 
 void reconnect() {
